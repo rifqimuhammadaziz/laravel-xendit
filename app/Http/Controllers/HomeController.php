@@ -73,4 +73,23 @@ class HomeController extends Controller
 
         }
     }
+
+    public function notification($id) {
+        $apiInstance = new InvoiceApi();
+
+        $result = $apiInstance->getInvoices(null, $id);
+
+        // Get Order
+        $order = Order::where('external_id', $id)->firstOrFail();
+
+        if ($order->status == 'SETTLED') {
+            return response()->json('Payment Anda telah berhasil diproses');
+        }
+
+        // Update Status
+        $order->status = $result[0]['status'];
+        $order->save();
+
+        return response()->json($order->status);
+    }
 }
